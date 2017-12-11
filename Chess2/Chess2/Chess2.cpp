@@ -1,11 +1,47 @@
-// "Chess2.cpp": Definiert den Einstiegspunkt für die Konsolenanwendung.
-//
+#include <SFML/Graphics.hpp>
+#include <time.h>
+#include <iostream>
 
-#include "stdafx.h"
+
+int main() {
+
+	sf::RenderWindow window(sf::VideoMode(437, 437), "MattseChess!");
+
+	sf::Texture t1;
+	if (!t1.loadFromFile("figures.png")) {
 
 
-int main()
-{
-    return 0;
+		std::cout << "Error loading texture" << std::endl;
+	}
+	sf::Sprite s(t1);
+
+	while (window.isOpen())
+	{
+		sf::Event e;
+
+		while (window.pollEvent(e)) {
+
+			if (e.type == sf::Event::Closed)
+				window.close();
+			break;
+
+
+
+			//Draw
+			window.clear();
+			window.draw(s);
+			window.display();
+
+
+
+		}
+
+
+
+
+
+
+	}
+
+	return 0;
 }
-
