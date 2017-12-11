@@ -8,7 +8,7 @@ int main() {
 	sf::RenderWindow window(sf::VideoMode(437, 437), "MattseChess!");
 
 	sf::Texture t1;
-	if (!t1.loadFromFile("figures.png")) {
+	if (!t1.loadFromFile("images/board.png")) {
 
 
 		std::cout << "Error loading texture" << std::endl;
@@ -27,15 +27,15 @@ int main() {
 
 
 
-			//Draw
-			window.clear();
-			window.draw(s);
-			window.display();
-
 
 
 		}
 
+
+		//Draw
+		window.clear();
+		window.draw(s);
+		window.display();
 
 
 
@@ -45,4 +45,4 @@ int main() {
 
 	return 0;
 }
-}
+
