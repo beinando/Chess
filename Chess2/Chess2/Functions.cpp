@@ -139,7 +139,7 @@ namespace functions {
 		double difference;
 		double relative_dev;
 		//tolerance for random-step
-		int offset = 0;
+		int offset = 500;
 		
 
 		int x = player.getPosition().x;
@@ -167,7 +167,7 @@ namespace functions {
 					difference = rel_max - (values[index]/mean);
 					//this here is around for setting up negative values to zero, means adding the minimal value to the vector entries
 					int dice_this = generate_random_number_0_to_max(int((maximum + abs(minimum))*100000));
-
+					int tester = (values[index] + abs(minimum)) * 100000;
 					if (dice_this <= (values[index]+abs(minimum))* 100000 - offset) {
 						trigger = true;
 					}
@@ -197,7 +197,8 @@ namespace functions {
 					}
 					//this here is around for setting up negative values to zero, means adding the minimal value to the vector entries
 					int dice_this = generate_random_number_0_to_max(int((maximum+abs(minimum))*100000));
-					
+					double tester = (values[index] + abs(minimum)) * 100000;
+
 					if (dice_this<= (values[index] + abs(minimum)) *100000-offset) {
 						trigger = true;
 					}

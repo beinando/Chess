@@ -34,7 +34,8 @@ double elapsed_time = double(chrono::duration_cast<chrono::nanoseconds>(end - st
 int main() {
 	int win = 0;
 	int lose = 0;
-	for(int i=0; i<200;i++){
+	int time_step = 50;
+	for(int i=0; i<1000;i++){
 	int start_vector_size=25;
 	vector<int> double_indices;
 	vector<double> start_vector;
@@ -64,7 +65,7 @@ int main() {
 
 
 	int any_key;
-	int time_step = 100;
+	
 	
 	sf::RenderWindow window(sf::VideoMode(5*56, 5*56), "MattseChess!");
 	
@@ -72,14 +73,18 @@ int main() {
 	sf::Texture t2;
 	sf::Texture _goal;
 	sf::Texture _fire;
+	sf::Texture _fire2;
 	sf::Texture _smiley;
 	sf::Texture _suspicious;
+	sf::Texture _suspicious2;
 	sf::Texture _wink;
 
 	_fire.loadFromFile("images/fire.png");
+	_fire2.loadFromFile("images/fire.png");
 	_goal.loadFromFile("images/racing.png");
 	_smiley.loadFromFile("images/thinking.png");
 	_suspicious.loadFromFile("images/suspicious.png");
+	_suspicious2.loadFromFile("images/suspicious.png");
 	_wink.loadFromFile("images/wink.png");
 
 	Music music;
@@ -111,13 +116,17 @@ int main() {
 
 
 	sf::Sprite fire(_fire);
+	sf::Sprite fire2(_fire2);
 	sf::Sprite smiley(_smiley);
 	sf::Sprite goal(_goal);
 	sf::Sprite suspicious(_suspicious);
+	sf::Sprite suspicious2(_suspicious2);
 	sf::Sprite wink(_wink);
 
-	suspicious.setPosition(0* 56, 3 * 56);
-	fire.setPosition(0 * 56, 3 * 56);
+	suspicious.setPosition(2* 56, 2 * 56);
+	suspicious2.setPosition(0 * 56, 4 * 56);
+	fire.setPosition(2 * 56, 2 * 56);
+	fire2.setPosition(0 * 56, 4 * 56);
 	smiley.setPosition(0, 0);
 	goal.setPosition(4 * 56, 4 * 56);
 	wink.setPosition(4 * 56, 4 * 56);
@@ -168,18 +177,21 @@ int main() {
 		// 5= number of fields per side
 		/*cout << smiley.getPosition().x/56 << endl;
 		cout << smiley.getPosition().y / 56 << endl;*/
-		int index = functions::get_index(smiley.getPosition().x, smiley.getPosition().y); 
-		previous_positions.push_back(index);
+
 		
 		
 
 	//	cout << previous_positions.back() << endl;
 
 
+		
+
+		//One of the key function: Make move depending on probability estimation from teached values
+		smiley = functions::make_probabilistic_move(smiley,new_values);
+		int index = functions::get_index(smiley.getPosition().x, smiley.getPosition().y);
+		previous_positions.push_back(index);
 		double_indices = functions::get_double_indices(previous_positions);
 
-		
-		smiley = functions::make_probabilistic_move(smiley,new_values);
 	//	smiley = functions::make_random_move(smiley);
 		std::chrono::milliseconds timespan(time_step); 
 
@@ -187,7 +199,7 @@ int main() {
 
 		
 		
-		if (smiley.getPosition() == fire.getPosition()) {
+		if (smiley.getPosition() == fire.getPosition() || smiley.getPosition() == fire2.getPosition()) {
 
 			for (int i = 0; i < double_indices.size(); i++) {
 
@@ -205,7 +217,7 @@ int main() {
 
 				int foo = previous_positions[i];
 				int test = previous_positions.size()-i;
-				double value_assign= -1 + (0.04*test)*(0.04*test);
+				double value_assign= -1 + 0.04*test;
 				new_values[foo] = new_values[foo] +  value_assign;
 
 			}
@@ -213,7 +225,13 @@ int main() {
 			functions::write_in_file(new_values);
 			
 			music_explosion.play();
-			window.draw(suspicious);
+			if (smiley.getPosition() == fire.getPosition()) {
+				window.draw(suspicious);
+			}
+			else{
+				window.draw(suspicious2);
+			}
+			
 			window.draw(goal);
 			window.display();
 			cout << "YOU LOSE! NOOB!" << endl;
@@ -237,11 +255,11 @@ int main() {
 		/*	int test = previous_positions[previous_positions.size() - 1];
 			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] + 1;*/
 
-			for (int i = previous_positions.size() - 1; i > 0; i--) {
+			for (int i = previous_positions.size()-1; i > 0; i--) {
 
 				int foo = previous_positions[i];
-				int test = i-previous_positions.size();
-				double value_assign = 1 - (0.04*(test))*(0.04*(test));
+				int test = previous_positions.size()-i;
+				double value_assign = 1 - 0.04*(test);
 				new_values[foo] = new_values[foo] + value_assign;
 
 			}
@@ -275,6 +293,7 @@ int main() {
 		//music.play();
 		window.draw(smiley);
 		window.draw(fire);
+		window.draw(fire2);
 		window.draw(goal);
 		window.display();
 
