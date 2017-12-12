@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <time.h>
 #include <iostream>
 #include <vector>
@@ -9,135 +10,23 @@
 #include <thread>
 #include <fstream>
 #include <string>
+#include <Windows.h>
+#include "Functions.hpp"
 
 using namespace sf;
 using namespace std;
 
+//measure performance
 
-
-int generate_random_number() {
-
-	std::mt19937 rng;
-	rng.seed(chrono::high_resolution_clock::now().time_since_epoch().count());
-	std::uniform_int_distribution<std::mt19937::result_type> dist6(0, 2); // distribution in range [1, 6]
-
-	return (int)dist6(rng)-1;
-	
-
-}
-
-Sprite make_random_move(Sprite player) {
-
-
-	int x = player.getPosition().x;
-	int y = player.getPosition().y;
-
-	int rand1= generate_random_number();
-	int rand2 = generate_random_number();
-
-	int new_x=0, new_y=0;
-
-	
-
-	if((rand1!=0) && (rand2==0)){
- 	new_x = x + 56 * rand1;
-	new_y = y;
-	}
-	else if ((rand1==0) && (rand2 != 0)){
-  	new_x = x;
-	new_y = y + 56 * rand2;
-	}
-
-	else{
- 		new_x = x; 
-		new_y = y;
-		make_random_move(player);
-		
-		
-	}
-
-	if (new_x < 0 || new_y < 0 || new_x > 4*56 || new_y > 4*56) {
-
-		new_x = x;
-		new_y = y;
-		make_random_move(player);
-
-	}
-
-	player.setPosition(new_x, new_y);
-
-	return player;
-}
-vector<double> read_from_file(){
-	
-	vector<double> values;
-	 
-	int i = 0;
-
-	string line;
-	fstream myfile("example.txt", std::ios_base::in);
-	if (myfile.is_open())
-	{
-		while (getline(myfile,line))
-		{
-			double a;
-			while (myfile >> a)
-			{
-				values.push_back(a);
-				printf("%f ", values[i]);
-				i++;
-			}
-		}
-		myfile.close();
-	}
-	
-
-	return values;
-}
-
-void write_in_file(vector<double> values) {
-	
-	ofstream myfile("example.txt");
-
-	if (myfile.is_open())
-	{
-		for(int i=0; i<values.size(); i++){
-		myfile << values[i] <<	"\n";
-
-		}
-		//to fix some reading/writing bugs, more tomorrow
-		myfile << 0 << "\n";
-		
-
-		myfile.close();
-	}
-	else cout << "Unable to open file";
-	
-
-
-	
-}
-
-void zeroes_in_file() {
-
-	ofstream myfile("example.txt");
-
-	if (myfile.is_open())
-	{
-		for (int i = 0; i<26; i++) {
-			myfile << 0 << "\n";
-
-		}
-
-
-		myfile.close();
-	}
-	else cout << "Unable to open file";
+/*	auto start = chrono::steady_clock::now();
+auto end = chrono::steady_clock::now();
+double elapsed_time = double(chrono::duration_cast<chrono::nanoseconds>(end - start).count());*/
 
 
 
 
-}
+
+
 
 
 
@@ -151,8 +40,8 @@ int main() {
 
 	
 
-	//zeroes_in_file();
-	values = read_from_file();
+	//functions::zeroes_in_file();
+	values = functions::read_from_file();
 
 	for (int i = 0; i < values.size(); i++) {
 		new_values.push_back(values[i]);
@@ -162,9 +51,7 @@ int main() {
 
 
 	int any_key;
-	int random_x = generate_random_number();
-	int random_y = generate_random_number();
-
+	
 	sf::RenderWindow window(sf::VideoMode(5*56, 5*56), "MattseChess!");
 	
 	sf::Texture t1;
@@ -181,11 +68,31 @@ int main() {
 	_suspicious.loadFromFile("images/suspicious.png");
 	_wink.loadFromFile("images/wink.png");
 
+	Music music;
+	Music music_explosion;
+	Music music_goal;
+	if (!music.openFromFile("audio/Blip_Select4.ogg")){
+		return -1; // error
+	}
+
+	if (!music_explosion.openFromFile("audio/Explosion20.ogg")) {
+		return -1; // error
+	}
+	if (!music_goal.openFromFile("audio/Powerup15.ogg")) {
+		return -1; // error
+	}
+	
+
+	
+
+	
+
 
 	if (!t1.loadFromFile("images/whitefield.png") || !t2.loadFromFile("images/blackfield.png")) {
 
 
 		std::cout << "Error loading texture" << std::endl;
+
 	}
 	sf::Sprite fire(_fire);
 	sf::Sprite smiley(_smiley);
@@ -246,8 +153,8 @@ int main() {
 		/*cout << smiley.getPosition().x/56 << endl;
 		cout << smiley.getPosition().y / 56 << endl;*/
 		int index = smiley.getPosition().x / 56 + smiley.getPosition().y / 56 * 5;
-
-		int checker = 0;
+		previous_positions.push_back(index);
+		/*int checker = 0;
 		for (int i = 0; i < previous_positions.size(); i++) {
 			if (index != previous_positions[i]) {
 
@@ -261,34 +168,41 @@ int main() {
 			
 		if (checker == 0) {
 			previous_positions.push_back(index);
-		}
+		}*/
 		
 
 		cout << previous_positions.back() << endl;
 
-		smiley = make_random_move(smiley);
-		std::chrono::milliseconds timespan(1); 
+		
+		
+		smiley = functions::make_random_move(smiley);
+		std::chrono::milliseconds timespan(100); 
 
 		std::this_thread::sleep_for(timespan);
 
+		
+
 		if (smiley.getPosition() == fire.getPosition()) {
 
-			for (int i = previous_positions.size()-1; i > 0; i--) {
+			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] - 1;
+
+			/*for (int i = previous_positions.size()-1; i > 0; i--) {
 
 				int foo = previous_positions[i];
 				int test = previous_positions.size()-i;
 				double value_assign= -1 + 0.04*test;
 				new_values[foo] = new_values[foo] +  value_assign;
 
-			}
+			}*/
 
-			write_in_file(new_values);
+			functions::write_in_file(new_values);
 			
-			
+			music_explosion.play();
 			window.draw(suspicious);
 			window.draw(goal);
 			window.display();
 			cout << "YOU LOSE! NOOB!" << endl;
+			
 			/*cout << "press any key to continue" << endl;
 			cin >> any_key;*/
 			window.close();
@@ -297,24 +211,26 @@ int main() {
 
 		if (smiley.getPosition() == goal.getPosition()) {
 
+			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] + 1;
 
-			for (int i = previous_positions.size() - 1; i > 0; i--) {
+			/*for (int i = previous_positions.size() - 1; i > 0; i--) {
 
 				int foo = previous_positions[i];
 				int test = i-previous_positions.size();
 				double value_assign = 1 - 0.04*(test);
 				new_values[foo] = new_values[foo] + value_assign;
 
-			}
+			}*/
 
-			write_in_file(new_values);
+			functions::write_in_file(new_values);
 
-			
+			music_goal.play();
 			window.draw(fire);
 			window.draw(wink);
 			window.display();
 			cout << "U'RE A CHAMP!!!" << endl;
-			/*cout << "press any key to continue" << endl;
+			
+		/*	cout << "press any key to continue" << endl;
 			cin >> any_key;*/
 			window.close();
 
@@ -331,6 +247,7 @@ int main() {
 		//	
 
 		//	}
+		music.play();
 		window.draw(smiley);
 		window.draw(fire);
 		window.draw(goal);

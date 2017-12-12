@@ -152,11 +152,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Connector.hpp" />
+    <ClInclude Include="Functions.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chess2.cpp" />
+    <ClCompile Include="Functions.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

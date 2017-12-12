@@ -27,9 +27,15 @@
     <ClInclude Include="Connector.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Functions.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chess2.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
