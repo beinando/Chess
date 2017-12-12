@@ -32,25 +32,39 @@ double elapsed_time = double(chrono::duration_cast<chrono::nanoseconds>(end - st
 
 
 int main() {
+	int win = 0;
+	int lose = 0;
+	for(int i=0; i<200;i++){
+	int start_vector_size=25;
+	vector<int> double_indices;
+	vector<double> start_vector;
+	
+	
+	for (int i = 0; i < start_vector_size; i++) {
+		start_vector.push_back(0);
+		
+	}
+
 
 	
+	//Rewrite values file with zeroes
+	//functions::zeroes_in_file(start_vector);
+
 	vector<double> values;
 	vector<double> new_values;
 	vector<int> previous_positions;
 
-	
+	values = functions::read_from_file(start_vector);
 
-	//functions::zeroes_in_file();
-	values = functions::read_from_file();
+	new_values = values;
 
-	for (int i = 0; i < values.size(); i++) {
-		new_values.push_back(values[i]);
-	}
+	functions::write_in_file(new_values);
 	
 
 
 
 	int any_key;
+	int time_step = 100;
 	
 	sf::RenderWindow window(sf::VideoMode(5*56, 5*56), "MattseChess!");
 	
@@ -94,6 +108,8 @@ int main() {
 		std::cout << "Error loading texture" << std::endl;
 
 	}
+
+
 	sf::Sprite fire(_fire);
 	sf::Sprite smiley(_smiley);
 	sf::Sprite goal(_goal);
@@ -152,48 +168,47 @@ int main() {
 		// 5= number of fields per side
 		/*cout << smiley.getPosition().x/56 << endl;
 		cout << smiley.getPosition().y / 56 << endl;*/
-		int index = smiley.getPosition().x / 56 + smiley.getPosition().y / 56 * 5;
+		int index = functions::get_index(smiley.getPosition().x, smiley.getPosition().y); 
 		previous_positions.push_back(index);
-		/*int checker = 0;
-		for (int i = 0; i < previous_positions.size(); i++) {
-			if (index != previous_positions[i]) {
-
-
-			}
-			else if (index == previous_positions[i]) {
-
-				checker = 1;
-			}
-		}
-			
-		if (checker == 0) {
-			previous_positions.push_back(index);
-		}*/
-		
-
-		cout << previous_positions.back() << endl;
-
 		
 		
-		smiley = functions::make_random_move(smiley);
-		std::chrono::milliseconds timespan(100); 
+
+	//	cout << previous_positions.back() << endl;
+
+
+		double_indices = functions::get_double_indices(previous_positions);
+
+		
+		smiley = functions::make_probabilistic_move(smiley,new_values);
+	//	smiley = functions::make_random_move(smiley);
+		std::chrono::milliseconds timespan(time_step); 
 
 		std::this_thread::sleep_for(timespan);
 
 		
-
+		
 		if (smiley.getPosition() == fire.getPosition()) {
 
-			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] - 1;
+			for (int i = 0; i < double_indices.size(); i++) {
 
-			/*for (int i = previous_positions.size()-1; i > 0; i--) {
+				int double_index = double_indices[i];
+				previous_positions[double_index] = 0;
+
+			}
+
+
+		/*	int test = previous_positions[previous_positions.size() - 1];
+
+			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] - 1;*/
+
+			for (int i = previous_positions.size()-1; i > 0; i--) {
 
 				int foo = previous_positions[i];
 				int test = previous_positions.size()-i;
-				double value_assign= -1 + 0.04*test;
+				double value_assign= -1 + (0.04*test)*(0.04*test);
 				new_values[foo] = new_values[foo] +  value_assign;
 
-			}*/
+			}
 
 			functions::write_in_file(new_values);
 			
@@ -202,6 +217,7 @@ int main() {
 			window.draw(goal);
 			window.display();
 			cout << "YOU LOSE! NOOB!" << endl;
+			lose++;
 			
 			/*cout << "press any key to continue" << endl;
 			cin >> any_key;*/
@@ -211,24 +227,33 @@ int main() {
 
 		if (smiley.getPosition() == goal.getPosition()) {
 
-			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] + 1;
+			for (int i = 0; i < double_indices.size(); i++) {
 
-			/*for (int i = previous_positions.size() - 1; i > 0; i--) {
+				int double_index = double_indices[i];
+				previous_positions[double_index] = 0;
+
+			}
+
+		/*	int test = previous_positions[previous_positions.size() - 1];
+			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] + 1;*/
+
+			for (int i = previous_positions.size() - 1; i > 0; i--) {
 
 				int foo = previous_positions[i];
 				int test = i-previous_positions.size();
-				double value_assign = 1 - 0.04*(test);
+				double value_assign = 1 - (0.04*(test))*(0.04*(test));
 				new_values[foo] = new_values[foo] + value_assign;
 
-			}*/
+			}
 
 			functions::write_in_file(new_values);
 
-			music_goal.play();
+			//music_goal.play();
 			window.draw(fire);
 			window.draw(wink);
 			window.display();
 			cout << "U'RE A CHAMP!!!" << endl;
+			win++;
 			
 		/*	cout << "press any key to continue" << endl;
 			cin >> any_key;*/
@@ -247,7 +272,7 @@ int main() {
 		//	
 
 		//	}
-		music.play();
+		//music.play();
 		window.draw(smiley);
 		window.draw(fire);
 		window.draw(goal);
@@ -260,6 +285,15 @@ int main() {
 	
 
 	CloseConnection();
+	}
+
+	cout << "win: " << win << endl;
+	cout << "lose: " << lose << endl;
+	cout << "win percentage: " << win / (win + lose) << endl;
+	cout << "____________________" << endl;
+	std::chrono::seconds timespan(1000);
+
+	std::this_thread::sleep_for(timespan);
 	return 0;
 }
 
