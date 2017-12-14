@@ -21,7 +21,8 @@ namespace functions {
 	////////////////////////////////////
 
 	int get_index(int x, int y) {
-		return (x / pixel_field + y / pixel_field * size_board);
+		int index = size_board*y+x;
+		return index;
 	}
 
 	double get_max(vector<double> values) {
@@ -69,17 +70,43 @@ namespace functions {
 
 	}
 
-	int get_x_from_position(int position) {
+	int get_x_index_from_position(int position) {
 
-		return position%size_board;
+		return (position%size_board);
 
 	}
+	int get_y_index_from_position(int position) {
+
+		return (position / size_board);
+
+	}
+
+	int get_x_from_position(int position) {
+
+		return (position%size_board)*pixel_field;
+
+	}
+
 
 	int get_y_from_position(int position) {
 
-		return position/size_board;
+		return (position/size_board)*pixel_field;
 
 	}
+
+	////////////////////////////////////
+	//////OTHERS////////////////////////
+	////////////////////////////////////
+	void sleep(int milliseconds) {
+
+		std::chrono::milliseconds timespan(milliseconds);
+
+		std::this_thread::sleep_for(timespan);
+
+	}
+
+	
+
 
 
 	////////////////////////////////////
@@ -179,6 +206,7 @@ namespace functions {
 	////////////////////////////////////
 	//////FUNCTIONS FOR THE GAME////////
 	////////////////////////////////////
+
 
 	Sprite make_random_move(Sprite player) {
 
