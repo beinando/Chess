@@ -12,9 +12,13 @@
 #include <string>
 #include <Windows.h>
 #include "Functions.hpp"
+#include "figure.h"
+
+
 
 using namespace sf;
 using namespace std;
+using namespace parameters;
 
 //measure performance
 
@@ -34,23 +38,28 @@ double elapsed_time = double(chrono::duration_cast<chrono::nanoseconds>(end - st
 int main() {
 	int win = 0;
 	int lose = 0;
-	int time_step = 50;
-	for(int i=0; i<1000;i++){
-	int start_vector_size=25;
+
+	//dummy key getting into the next loop
+	int loop_key;
+	//dummy key getting into the next step
+	int step_key;
+	
+
+	//BIG loop over almost everything in  main()
+	for(int i=0; i<loops;i++){
+
+	int start_vector_size=size_board*size_board;
 	vector<int> double_indices;
 	vector<double> start_vector;
-	
-	
+
 	for (int i = 0; i < start_vector_size; i++) {
 		start_vector.push_back(0);
-		
 	}
 
-
-	
 	//Rewrite values file with zeroes
-	//functions::zeroes_in_file(start_vector);
-
+	if(reset_values){
+		functions::zeroes_in_file(start_vector);
+	}
 	vector<double> values;
 	vector<double> new_values;
 	vector<int> previous_positions;
@@ -62,15 +71,13 @@ int main() {
 	functions::write_in_file(new_values);
 	
 
+	sf::RenderWindow window(sf::VideoMode(size_board *pixel_field, size_board *pixel_field), "MattseChess!");
+	
 
 
-	int any_key;
-	
-	
-	sf::RenderWindow window(sf::VideoMode(5*56, 5*56), "MattseChess!");
-	
-	sf::Texture t1;
-	sf::Texture t2;
+
+	sf::Texture _t1;
+	sf::Texture _t2;
 	sf::Texture _goal;
 	sf::Texture _fire;
 	sf::Texture _fire2;
@@ -86,34 +93,10 @@ int main() {
 	_suspicious.loadFromFile("images/suspicious.png");
 	_suspicious2.loadFromFile("images/suspicious.png");
 	_wink.loadFromFile("images/wink.png");
-
-	Music music;
-	Music music_explosion;
-	Music music_goal;
-	if (!music.openFromFile("audio/Blip_Select4.ogg")){
-		return -1; // error
-	}
-
-	if (!music_explosion.openFromFile("audio/Explosion20.ogg")) {
-		return -1; // error
-	}
-	if (!music_goal.openFromFile("audio/Powerup15.ogg")) {
-		return -1; // error
-	}
+	_t1.loadFromFile("images/whitefield.png");
+	_t2.loadFromFile("images/blackfield.png");
 	
-
 	
-
-	
-
-
-	if (!t1.loadFromFile("images/whitefield.png") || !t2.loadFromFile("images/blackfield.png")) {
-
-
-		std::cout << "Error loading texture" << std::endl;
-
-	}
-
 
 	sf::Sprite fire(_fire);
 	sf::Sprite fire2(_fire2);
@@ -123,13 +106,13 @@ int main() {
 	sf::Sprite suspicious2(_suspicious2);
 	sf::Sprite wink(_wink);
 
-	suspicious.setPosition(2* 56, 2 * 56);
-	suspicious2.setPosition(0 * 56, 4 * 56);
-	fire.setPosition(2 * 56, 2 * 56);
-	fire2.setPosition(0 * 56, 4 * 56);
+	suspicious.setPosition(2* pixel_field, 2 * pixel_field);
+	suspicious2.setPosition(0 * pixel_field, 4 * pixel_field);
+	fire.setPosition(2 * pixel_field, 2 * pixel_field);
+	fire2.setPosition(0 * pixel_field, 4 * pixel_field);
 	smiley.setPosition(0, 0);
-	goal.setPosition(4 * 56, 4 * 56);
-	wink.setPosition(4 * 56, 4 * 56);
+	goal.setPosition(4 * pixel_field, 4 * pixel_field);
+	wink.setPosition(4 * pixel_field, 4 * pixel_field);
 
 	
 	sf::Sprite field[5][5];
@@ -138,13 +121,13 @@ int main() {
 		for (int j = 0; j < 5; j++) {
 
 			if ((i + j) % 2 == 0) {
-				field[i][j] = sf::Sprite(t1);
+				field[i][j] = sf::Sprite(_t1);
 			}
 			else {
-				field[i][j] = sf::Sprite(t2);
+				field[i][j] = sf::Sprite(_t2);
 			}
 			
-			field[i][j].setPosition(i * 56, j * 56);
+			field[i][j].setPosition(i * pixel_field, j * pixel_field);
 
 		}
 
@@ -164,26 +147,15 @@ int main() {
 
 		}
 
-
-		//Draw field
-		window.clear();
-		for (int i = 0; i < 5; i++) {
-			for (int j = 0; j < 5; j++) {
-				window.draw(field[i][j]);
+		if(parameters::visual_output){
+			//Draw field
+			window.clear();
+			for (int i = 0; i < 5; i++) {
+				for (int j = 0; j < 5; j++) {
+					window.draw(field[i][j]);
+				}
 			}
 		}
-		
-		
-		// 5= number of fields per side
-		/*cout << smiley.getPosition().x/56 << endl;
-		cout << smiley.getPosition().y / 56 << endl;*/
-
-		
-		
-
-	//	cout << previous_positions.back() << endl;
-
-
 		
 
 		//One of the key function: Make move depending on probability estimation from teached values
@@ -192,9 +164,8 @@ int main() {
 		previous_positions.push_back(index);
 		double_indices = functions::get_double_indices(previous_positions);
 
-	//	smiley = functions::make_random_move(smiley);
-		std::chrono::milliseconds timespan(time_step); 
-
+		//wait for next step (for visualization)
+		std::chrono::milliseconds timespan(time_scale);
 		std::this_thread::sleep_for(timespan);
 
 		
@@ -208,11 +179,6 @@ int main() {
 
 			}
 
-
-		/*	int test = previous_positions[previous_positions.size() - 1];
-
-			new_values[previous_positions[previous_positions.size() - 1]] = new_values[previous_positions[previous_positions.size() - 1]] - 1;*/
-
 			for (int i = previous_positions.size()-1; i > 0; i--) {
 
 				int foo = previous_positions[i];
@@ -224,7 +190,6 @@ int main() {
 
 			functions::write_in_file(new_values);
 			
-			music_explosion.play();
 			if (smiley.getPosition() == fire.getPosition()) {
 				window.draw(suspicious);
 			}
@@ -237,8 +202,11 @@ int main() {
 			cout << "YOU LOSE! NOOB!" << endl;
 			lose++;
 			
-			/*cout << "press any key to continue" << endl;
-			cin >> any_key;*/
+			if(use_loop_keys){
+				cout << "press any key to continue" << endl;
+				cin >> loop_key;
+			}
+
 			window.close();
 
 		}
@@ -273,24 +241,27 @@ int main() {
 			cout << "U'RE A CHAMP!!!" << endl;
 			win++;
 			
-		/*	cout << "press any key to continue" << endl;
-			cin >> any_key;*/
+			if (use_loop_keys) {
+				cout << "press any key to continue" << endl;
+				cin >> loop_key;
+			}
 			window.close();
 
 		}
 		
-		//if (e.type == sf::Event::KeyPressed)
-		//	if (e.key.code == sf::Keyboard::Space)
-		//	{
-		//		fire = make_random_move(fire);
-		//		std::chrono::seconds timespan(5); // or whatever
-
-		//		std::this_thread::sleep_for(timespan);
+		//if(use_step_keys){
+		//	if (e.type == sf::Event::KeyPressed)
+		//		if (e.key.code == sf::Keyboard::Space)
+		//		{
+		//			fire = functions::make_probabilistic_move(smiley);
+		//			std::chrono::seconds timespan(5); // or whatever
+		//			std::this_thread::sleep_for(timespan);
 
 		//	
 
-		//	}
-		//music.play();
+		//		}
+		//}
+	
 		window.draw(smiley);
 		window.draw(fire);
 		window.draw(fire2);

@@ -36,12 +36,24 @@
     <ClInclude Include="Functions.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="figure.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Parameters.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chess2.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Functions.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="figure.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Parameters.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include "Parameters.hpp"
 
 using namespace sf;
 using namespace std;
@@ -24,5 +25,7 @@ namespace functions{
 	void write_in_file(vector<double> values);
 	void zeroes_in_file(vector<double> start_vector);
 	vector<int> get_double_indices(vector<int> prev_positions);
-
+	int get_x_from_position(int position);
+	int get_y_from_position(int position);
+	
 }
