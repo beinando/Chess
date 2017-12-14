@@ -1,4 +1,6 @@
 #include "Functions.hpp"
+#include "chessboard.h"
+
 
 using namespace functions;
 
@@ -14,8 +16,10 @@ public:
 	sf::Sprite sprite;
 	int figure_x;
 	int figure_y;
-	vector<int> calculate_allowed_fields(int type, int position);
-	int make_random_figure_move(figure input_fig);
+	vector<int> calculate_allowed_fields(int type, int position,vector<int> board_status);
+	int make_random_figure_move(int type, int position, vector<int> board_status);
+	bool is_alive;
+	vector<int>allowed_fields;
 
 
 	~figure();

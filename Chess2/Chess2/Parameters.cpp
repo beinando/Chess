@@ -5,7 +5,7 @@ namespace parameters {
 
 
 	
-	int size_board=5;
+	int size_board=4;
 	int loops=20;
 	int pixel_field=56;	
 	bool reset_values=false;

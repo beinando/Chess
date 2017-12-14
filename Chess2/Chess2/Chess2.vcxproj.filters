@@ -42,6 +42,12 @@
     <ClInclude Include="Parameters.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="field.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="chessboard.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Chess2.cpp">
@@ -54,6 +60,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Parameters.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="field.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="chessboard.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
